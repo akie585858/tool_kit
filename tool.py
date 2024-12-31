@@ -1,6 +1,6 @@
 import json
 import os
-from torch.optim.lr_scheduler import MultiStepLR
+from torch.optim.lr_scheduler import MultiStepLR, LinearLR
 
 def process_setting(json_file):
     with open(json_file, 'r') as f:
@@ -27,13 +27,20 @@ def process_setting(json_file):
 
 
 class MyMultiStepLR(MultiStepLR):
-    def __init__(self, complete_nums, optimizer , milestones:list, gamma = ..., last_epoch = ..., verbose = ...):
+    def __init__(self, complete_nums, optimizer , milestones:list, gamma ):
         result_stones = []
         start = False
         for stone in milestones:
-            if complete_nums-stone >= 0:
+            if complete_nums-stone < 0:
                 start = True
             if start:
+                if complete_nums < 0:
+                    complete_nums = 0
                 result_stones.append(stone-complete_nums)
 
-        super().__init__(optimizer, result_stones, gamma, last_epoch, verbose)
+        super().__init__(optimizer=optimizer, milestones=result_stones, gamma=gamma)
+
+class MyLinearLR(LinearLR):
+    def __init__(self, complete_nums, optimizer, start_factor, end_factor, total_iters):
+        # if complete_nums < 0:
+        super().__init__(optimizer, start_factor, end_factor, total_iters)

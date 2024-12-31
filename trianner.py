@@ -42,8 +42,11 @@ class Scheduler():
                 scheduler['epoch_nums'] -= count
                 process_result.append(scheduler)
                 count = 0
+        if count > 0:
+            print('该训练已完成')
+            exit()
             
-        return self.schedulers
+        return process_result
 
 class Trainner():
     def __init__(self, net:Module, loss_fn:Module, dataset:Dataset|IterableDataset, test_dataset:Dataset|IterableDataset,  counter:Counter, test_counter:Counter, saver:Saver, scheduler:Scheduler, batch_size:int, r_batch_size:int, device:str='cuda') -> None:
